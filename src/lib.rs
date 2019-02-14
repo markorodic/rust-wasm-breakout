@@ -28,38 +28,68 @@ macro_rules! log {
 //////////////////////////////
 
 #[wasm_bindgen]
-struct GameState {
-
+pub struct SharedState {
     pub game_area_width : i32,
-    pub ball_position : Vec<i32>,
-    pub ball_velocity : Vec<i32>,
+    pub ball_position_x : i32,
+    pub ball_position_y : i32,
+    pub ball_velocity_x : i32,
+    pub ball_velocity_y : i32,
 
     pub ball_diameter : i32,
     pub brick_size_x : i32,
     pub brick_size_y : i32,
 
-    pub paddle_size : Vec<i32>,
+    pub paddle_size_x : i32,
+    pub paddle_size_y : i32,
+    bricks : Vec<u8>,
+    pub columns : i32,
+    pub rows : i32,
+    pub brick_size : i32,
 }
 
 #[wasm_bindgen]
-impl GameState {
+impl SharedState {
     pub fn new() -> Self {
+        let bricks = (0..14 * 14)
+            .map(|i| {
+                if i % 2 == 0 {
+                    0
+                }
+                else {
+                    1
+                }
+            }).collect();
+
         Self {
             game_area_width : 500,
+            columns : 14,
+            rows : 14,
+            brick_size : 29,
             // ball: Ball::new(500),
-            ball_position : vec![250, 250],
-            ball_velocity : vec![1, 1],
+            ball_position_x : 250,
+            ball_position_y : 250,
+            ball_velocity_x : 1,
+            ball_velocity_y : 1,
+
             ball_diameter : 6,
             brick_size_x : 29,
             brick_size_y : 29,
-            paddle_size : vec![60, 6],
+            paddle_size_x : 60,
+            paddle_size_y : 6,
+            bricks,
         }
     }
 
     pub fn update(&mut self) {
-        log!("updating");
+        // log!("updating {}", self.ball_position_x);
+        self.ball_position_x += self.ball_velocity_x;
+        self.ball_position_y += self.ball_velocity_y;
+    }
+    pub fn bricks(&self) -> *const u8 {
+        self.bricks.as_ptr()
     }
 }
+
 
 // struct Ball {
 //     pub position : (i32, i32),
